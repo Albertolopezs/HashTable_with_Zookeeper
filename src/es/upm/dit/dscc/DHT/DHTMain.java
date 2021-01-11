@@ -41,13 +41,12 @@ public class DHTMain{
 	private static String rootServers = "/servers";
 	private String userId;
 	private static final int SESSION_TIMEOUT = 5000;
-	public List<String> list_servers;
+	public List<String> list_servers = new ArrayList<String>();
 	public Integer outputMutex = -1;
 	public Integer initMutex = -1;
 	public DHTMain() {
 		Random rand = new Random();
 		int i = rand.nextInt(hosts.length);
-		System.out.println("Hosts: "+i);
 		//this.myIndex;
 		//this.minIndexValue = minIndexValue;
 		//this.maxIndexValue = maxIndexValue;
@@ -77,7 +76,6 @@ public class DHTMain{
 					// Created the znode, if it is not created.
 					response = zk.create(rootUsers, new byte[0], 
 							Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-					System.out.println(response);
 				}
 				
 				Stat s2 = zk.exists(rootServers, watcherMember); //this);
@@ -85,7 +83,6 @@ public class DHTMain{
 					// Created the znode, if it is not created.
 					response = zk.create(rootServers, new byte[0], 
 							Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-					System.out.println(response);
 				}
 				//Conseguimos los servidores ya creados
 				List<String> list_child = zk.getChildren(rootServers, watcherMember, s);
@@ -97,7 +94,6 @@ public class DHTMain{
 				this.userId = this.userId.replace(rootUsers + "/", "");
 				//Y creamos el watcher a nosotros mismos
 				String userPath = rootUsers+"/"+userId;
-				System.out.println(userPath);
 				zk.getChildren(userPath,  selfWatcherUser, s); //this);
 
 				//printListOperations(list2);
@@ -152,7 +148,7 @@ public class DHTMain{
 					
 				case REMOVE_MAP:
 					System.out.println("Se ha borrado el campo: " + msg.getKey() + "con valor: " + msg.getValue());
-					break;
+					break; 
 					
 				default:
 					System.out.println("No se ha reconocido el tipo de operacion");
@@ -294,23 +290,32 @@ public class DHTMain{
 			try {
 				correct = false;
 				menuKey = 0;
-				if(!dht.isQuorum) {
-					System.out.println("No hay quorum. No es posible ejecutar su elección");
-					continue;
-				}
+				
 				while (!correct) {
-					System.out.println(">>> Enter option: 1) Put. 2) Get. 3) Reomve. 0) Exit");				
+					System.out.println(">>> Enter option: 1) Put. 2) Get. 3) Remove. 0) Exit");				
 					if (sc.hasNextInt()) {
 						menuKey = sc.nextInt();
 						correct = true;
 						Random rand = new Random();
-						int_random = rand.nextInt(dht.list_servers.size());
+						int size_servers = dht.list_servers.size();
+						if (size_servers > 0) {
+							int_random = rand.nextInt(size_servers);
+						}
+						else {
+							System.out.println("No hay ningún servidor disponible.");
+							continue;
+						}
+						
 						
 					} else {
 						sc.next();
 						System.out.println("The provised text provided is not an integer");
 					}
 					
+				}
+				if(!dht.isQuorum) {
+					System.out.println("No hay quorum. No es posible ejecutar su elección");
+					continue;
 				}
 
 				

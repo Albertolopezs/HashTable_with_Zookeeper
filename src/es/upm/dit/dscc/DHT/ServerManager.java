@@ -96,6 +96,7 @@ public class ServerManager {
 			try {
 				System.out.println("------------------Watcher Member------------------\n");	
 				List<String> servers = zk.getChildren(rootServers,  watcherMember);
+				System.out.println("El número de servers en Zookeeper es: "+ servers.size());
 				if (servers.size() > operative_servers.size()) {
 					//El numero de servidores es mayor -> servidor creado.
 					System.out.println("Lista de servidores activos actualizada.");
@@ -103,7 +104,7 @@ public class ServerManager {
 				}
 				else if (servers.size() < operative_servers.size()) {
 
-					
+				 	
 					//El numero de servidores es menor -> servidor borrado
 					//Obtenemos que servidor ha sido borrado
 					
@@ -116,6 +117,7 @@ public class ServerManager {
 							if (list_servers.get(j).myId.equals(op_s_id)){
 								//Este servidor lo tenemos
 								found = true;
+								
 								break;
 							}
 						
@@ -125,6 +127,7 @@ public class ServerManager {
 							//Este servidor ya no está operativo, borramos el objeto
 							System.out.println("El servidor con index "+dropped_s.myIndex+" se ha caido o ha sido eliminado.");
 							list_servers.remove(dropped_s);
+							dropped_s = null;
 
 						}
 					}
